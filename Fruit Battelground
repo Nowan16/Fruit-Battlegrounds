@@ -1,0 +1,693 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/sol"))()
+
+-- Variables -- 
+
+local Player = game.Players.LocalPlayer
+local Players = game:GetService("Players")
+local Camera = game.Workspace.CurrentCamera
+local Boxes = {}
+local PlayerList = {}
+local KilledPlayers = {}
+local PlayerFruit = ""
+
+local UIS = game:GetService("UserInputService")
+local CodesTable = {"MAGMALETSGOO", "SORRY4SHUTDOWN", "60KLETSGOOOO", "FREEBREAD!", "THXFOR70K", "80KAHHHHH"}
+
+local TPModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/LeoKholYt/roblox/main/lk_serverhop.lua"))
+
+local Platform = Instance.new("Part", game.Workspace)
+Platform.Name = "JustAPlatform"
+Platform.Size = Vector3.new(30, 5, 30)
+Platform.Position = Vector3.new(19.2002506, 2713.98438, -558.003052, 0.0322295688, 0.519283831, -0.853993893, -8.17714252e-08, 0.854437768, 0.519553721, 0.999480486, -0.0167449228, 0.0275382046)
+Platform.CanCollide = true
+Platform.Anchored = true
+
+for i, v in pairs(Players:GetPlayers()) do
+    if v.Name ~= Player.Name then
+        if not table.find(PlayerList, v.Name) then
+            table.insert(PlayerList, v.Name)
+        end
+    end
+end
+
+for i, v in pairs(getconnections(game.Players.LocalPlayer.Idled)) do
+    v:Disable()
+end
+
+-- Some Functions Here --
+
+local AllIDs = {}
+local FoundSomething = ""
+local ActualHour =  os.date("!*t").hour
+local Deleted = false
+local TeleportService = game:GetService("TeleportService")
+local Http = game:GetService("HttpService")
+
+local File = pcall(function()
+    AllIDs = HttpService:JSONDecode(readfile("ServerHop.json"))
+end)
+
+if not File then
+    table.insert(AllIDs, ActualHour)
+    pcall(function()
+        writefile("ServerHop.json", HttpService:JSONEncode(AllIDs))
+    end)
+end
+
+local function TPReturner(PlaceID)
+    local Site
+    if FoundSomething == "" then
+        Site = HttpService:JSonDecode(game:HttpGet("https://www.roblox.com/v1/games" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
+    else
+        Site = HttpService:JSonDecode(game:HttpGet("https://www.roblox.com/v1/games" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100&cursor=" .. FoundSomething))
+    end
+
+    local ID = ""
+    if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+        FoundSomething = Site.nextPageCursor
+    end
+
+    local sum = 0
+    for i, v in pairs(Site.data) do
+        local Possible = true
+        ID = tostring(v.id)
+        if tonumber(v.maxPlayers) > tonumber(v.playing) then
+            for i2, Existing in pairs(AllIDs) do
+                if sum ~= 0 then
+                    if ID == tostring(Existing) then
+                        Possible = false
+                    end
+                else
+                    if tonumber(ActualHour) ~= tonumber(Existing) then
+                        local DelFile = pcall(function()
+                            delfile("ServerHop.json")
+                            AllIDs = {}
+                            table.insert(AllIDs, ActualHour)
+                        end)
+                    end
+                end
+                sum = sum + 1
+            end
+            if Possible == true then
+                table.insert(AllIDs, ID)
+                wait()
+                pcall(function()
+                    writefile("ServerHop.json", HttpService:JSONEncode(AllIDs))
+                    wait()
+                    TeleportService:TeleportToPlaceInstance(game.PlaceId, ID, Player)
+                end)
+                wait(4)
+            end
+        end
+    end
+end
+
+-- Section and Tabs --
+
+local Window = Library:New({
+    Name = "Fruit Battlegrounds",
+    FolderToSave = "Nowan Hub"
+})
+
+local Main = Window:Tab("Main")
+local LP = Window:Tab("Local Player")
+local Misc = Window:Tab("Misc")
+
+---------- Main Section ----------
+
+local AF = Main:Section("Auto Farm")
+local AS = Main:Section("Auto Spin")
+local AP = Main:Section("Auto Farm Player")
+local ES = Main:Section("ESP")
+
+local AutoFarmXP
+local AFToggle1 = AF:Toggle("Auto Farm XP", false, "AutoFarmXP1", function(Value)
+    AutoFarmXP = Value
+end)
+
+local AutoReset
+local AFToggle2 = AF:Toggle("Reset when Low Stamina", false, "ResetLowStam1", function(Value)
+    AutoReset = Value
+end)
+
+local SkillsTable = {}
+local AFMD1 = AF:MultiDropdown("Select Skills", {"Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"}, {"Skill 1"}, "SelectSkills1", function(Option)
+    SkillsTable = Option
+end)
+
+AF:Button("Teleport to AFK Place", function()
+    Player.Character.HumanoidRootPart.CFrame = CFrame.new(531.474609375, 734.0032348632812, 1484.79150390625)
+end)
+
+local FruitsTable = {}
+local ASMD1 = AS:MultiDropdown("Select Fruits", {"Quake", "Gravity", "Magma", "Flame", "Light", "Darkness", "Ice", "Bomb"}, {"Quake", "Gravity"}, "SelectFruits1", function(Option)
+    FruitsTable = Option    
+end)
+
+local SpinMethod
+local ASD1 = AS:Dropdown("Spin Method", {"Normal", "Fast"}, "Normal", "SpinMethod1", function(Option)
+    SpinMethod = Option
+end)
+
+local AutoSpin
+local ASToggle1 = AS:Toggle("Auto Spin", false, "AutoSpin1", function(Value)
+    AutoSpin = Value
+end)
+
+AS:Button("Redeem All Codes", function()
+    for i, v in pairs(CodesTable) do
+        local ohString1 = "Codes"
+        local ohString2 = "Redeem"
+        local ohTable3 = {["Code"] = v}
+        game:GetService("ReplicatedStorage").Replicator:InvokeServer(ohString1, ohString2, ohTable3)
+    end
+end)
+
+local AutoFarmPlayer
+local APToggle1 = AP:Toggle("Auto Farm Player (Risky)", false, "NoSave", function(Value)
+    AutoFarmPlayer = Value
+end)
+
+local Target = "Lowest"
+local Highest = nil
+local Lowest = nil
+local APD1 = AP:Dropdown("Target", {"Highest", "Lowest"}, "Lowest", "DontSave1", function(Option)
+    Target = Option
+end)
+
+local SelectedPlayer = ""
+local APD2 = AP:Dropdown("Player List", PlayerList, "", "DontSave2", function(Option)
+    SelectedPlayer = Option
+end)
+
+AP:Button("Refresh Player List", function()
+    LPTD1:Refresh(PlayerList, true)
+end)
+
+AP:Button("Teleport to Selected Player", function()
+    if SelectedPlayer ~= "" then
+        if game.Players[SelectedPlayer].Character and Player.Character then
+            if game.Players[SelectedPlayer].Character:FindFirstChild("HumanoidRootPart") then
+                local HumPart = game.Players[SelectedPlayer].Character:WaitForChild("HumanoidRootPart")
+                Player.Character:WaitForChild("HumanoidRootPart").CFrame = HumPart.CFrame * CFrame.new(0, 0, 5)
+            else
+                Library:Notification("Error", "Selected Player Humanoid Root Part is missing")
+            end
+        else
+            Library:Notification("Error", "Selected Player Character not found or Your Character not found")
+        end
+    else
+        Library:Notification("Error", "Please Select a Player first")
+    end
+end)
+
+local PlayerESP
+local ESToggle1 = ES:Toggle("Player ESP", false, "PlayerEsp1", function(Value)
+    PlayerESP = Value
+end)
+
+local BoxESP
+local ESToggle2 = ES:Toggle("Box ESP", false, "BoxEsp1", function(Value)
+    BoxESP = Value
+end)
+
+---------- Local Player Section ----------
+
+local LPS = LP:Section("Local Player")
+local LPT = LP:Section("Teleports")
+
+local PlrSpeed = 32
+local LPSSlider1 = LPS:Slider("Walkspeed", 16, 200, 32, 1, "Speed2", function(Value)
+    PlrSpeed = Value
+end)
+
+local PlrJump = 60
+local LPSSlider2 = LPS:Slider("Jump Power", 50, 300, 60, 1, "Power2", function(Value)
+    PlrJump = Value
+end)
+
+local InfiniteJump
+local LPSToggle1 = LPS:Toggle("Infinite Jump", false, "InfJump1", function(Value)
+    InfiniteJump = Value
+end)
+
+LPT:Button("Teleport to Forest 1", function()
+    Player.Character.HumanoidRootPart.CFrame = CFrame.new(-922.948669, 781.84491, -825.520935, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+end)
+
+LPT:Button("Teleport to Forest 2", function()
+    Player.Character.HumanoidRootPart.CFrame = CFrame.new(-417.323425, 742.844788, 379.830719, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+end)
+
+LPT:Button("Teleport to Dressrosa", function()
+    Player.Character.HumanoidRootPart.CFrame = CFrame.new(405.75592, 736.885071, -677.465027, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+end)
+
+LPT:Button("Teleport to Colloseum 1", function()
+    Player.Character.HumanoidRootPart.CFrame = CFrame.new(920.174622, 736.690918, 1179.45166, 0.707134247, 0, 0.707079291, 0, 1, 0, -0.707079291, 0, 0.707134247)
+end)
+
+LPT:Button("Teleport to Colloseum 2", function()
+    Player.Character.HumanoidRootPart.CFrame = CFrame.new(626.579285, 736.690918, 362.104034, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+end)
+
+-- Misc Section --
+
+local MS = Misc:Section("Misc")
+
+MS:Button("Hop Server (Click 1 time)", function()
+    while wait() do
+        pcall(function()
+            TPReturner(game.PlaceId)
+            if FoundSomething ~= "" then
+                TPReturner(game.PlaceId)
+            end
+        end)
+    end
+end)
+
+MS:Button("Rejoin Server", function()
+    game:GetService("TeleportService"):Teleport(game.PlaceId, Player)
+end)
+
+MS:Button("Copy Discord Link", function()
+    setclipboard("https://discord.gg/pdsSGSsUj2")
+end)
+
+-- Some Functions --
+
+local function GetHighestBounty()
+    for i, v in pairs(game.Players:GetChildren()) do
+        if v.Name ~= game.Players.LocalPlayer.Name then
+            if v.Character then
+                print(table.find(KilledPlayers, v.Name))
+                if v:WaitForChild("leaderstats") and not table.find(KilledPlayers, v.Name) then
+                    if not Highest then
+                        Highest = v
+                    end
+                    
+                    if v.leaderstats.Bounty.Value > Highest.leaderstats.Bounty.Value then
+                        Highest = v
+                    end
+                end
+            end
+        end
+    end
+    return Highest
+end
+
+local function GetLowestBounty()
+    for i, v in pairs(game.Players:GetChildren()) do
+        if v.Name ~= game.Players.LocalPlayer.Name then
+            if v.Character then
+                print(table.find(KilledPlayers, v.Name))
+                if v:WaitForChild("leaderstats") and not table.find(KilledPlayers, v.Name) then
+                    if not Lowest then
+                        Lowest = v
+                    end
+                    
+                    if v.leaderstats.Bounty.Value < Lowest.leaderstats.Bounty.Value then
+                        Lowest = v
+                    end
+                end
+            end
+        end
+    end
+    return Lowest
+end
+
+local function Round(n)
+    return math.floor(tonumber(n) + 0.5)
+end
+
+local function NewLine()
+    local v = Drawing.new("Line")
+    v.Color = Color3.fromRGB(255, 255, 255)
+    v.From = Vector2.new(1, 1)
+    v.To = Vector2.new(0, 0)
+    v.Visible = true
+    v.Thickness = 2
+    return v 
+end
+
+local function NewBox(Plr)
+    local Box = {
+        ["Player"] = Plr, NewLine(), NewLine(), NewLine(), NewLine()
+    }
+    table.insert(Boxes, Box)
+end
+
+local function ShapeBox(Box)
+    local Plr = Box["Player"]
+    local TopLeft = Camera:WorldToViewportPoint(Plr.Character.HumanoidRootPart.CFrame * CFrame.new(-3, 3, 0).p)
+    local TopRight = Camera:WorldToViewportPoint(Plr.Character.HumanoidRootPart.CFrame * CFrame.new(3, 3, 0).p)
+    local BottomLeft = Camera:WorldToViewportPoint(Plr.Character.HumanoidRootPart.CFrame * CFrame.new(-3, -3, 0).p)
+    local BottomRight = Camera:WorldToViewportPoint(Plr.Character.HumanoidRootPart.CFrame * CFrame.new(3, -3, 0).p)
+
+    Box[1].From = Vector2.new(TopLeft.X, TopLeft.Y)
+    Box[1].To = Vector2.new(BottomLeft.X, BottomLeft.Y)
+
+    Box[2].From = Vector2.new(TopRight.X, TopRight.Y)
+    Box[2].To = Vector2.new(TopLeft.X, TopLeft.Y)
+
+    Box[3].From = Vector2.new(BottomRight.X, BottomRight.Y)
+    Box[3].To = Vector2.new(TopRight.X, TopRight.Y)
+
+    Box[4].From = Vector2.new(BottomRight.X, BottomRight.Y)
+    Box[4].To = Vector2.new(BottomLeft.X, BottomLeft.Y)
+end
+
+local function VisBox(Box, Vis)
+    for i, v in ipairs(Box) do
+        v.Visible = Vis
+    end
+end
+
+local function HasBox(Plr)
+    for i, v in ipairs(Boxes) do
+        if v["Player"] == Plr then
+            return true
+        end
+    end
+end
+
+local function Action(Object, Function)
+    if Object ~= nil then
+        Function(Object)
+    end
+end
+
+local function Reset()
+    Player.Character.Humanoid.Health = 0
+    wait(15)
+    require(game.ReplicatedStorage.Loader).ServerEvent("Core", "LoadCharacter", {})
+    require(game.ReplicatedStorage.Loader).ServerEvent("Main", "LoadCharacter")
+    if (Player.Character or Player.CharacterAdded:Wait()) and Player.Character:WaitForChild("Humanoid") then
+        game.Workspace.CurrentCamera.CameraSubject = Player.Character.Humanoid
+        Player.PlayerGui.UI.MainMenu.Visible = false
+        Player.PlayerGui.UI.HUD.Visible = true
+        game:GetService("StarterGui"):SetCoreGuiEnabled("Backpack", false)
+        game:GetService("StarterGui"):SetCoreGuiEnabled("PlayerList",true)
+        game:GetService("StarterGui"):SetCoreGuiEnabled("Chat",true)
+        Player.Character.HumanoidRootPart.CFrame = CFrame.new(531.474609375, 734.0032348632812, 1484.79150390625)
+    end
+end
+
+-- Running Script --
+
+UIS.InputBegan:Connect(function(Input, GP)
+    if Input.UserInputType == Enum.UserInputType.Keyboard and Input.KeyCode == Enum.KeyCode.Space and InfiniteJump and not GP then
+        Action(Player.Character.Humanoid, function(self)
+            if self:GetState() == Enum.HumanoidStateType.Jumping or self:GetState() == Enum.HumanoidStateType.Freefall then
+                Action(self.Parent.HumanoidRootPart, function(self)
+                    self.Velocity = Vector3.new(0, PlrJump, 0)
+                end)
+            end
+        end)
+    end
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    PlayerFruit = Player.MAIN_DATA.Slots[Player.MAIN_DATA.Slot.Value].Value
+
+    if Player.Character then
+        if Player.Character:WaitForChild("Humanoid") then
+            Player.Character:WaitForChild("Humanoid").WalkSpeed = PlrSpeed
+            Player.Character:WaitForChild("Humanoid").JumpPower = PlrJump
+            game.Workspace.CurrentCamera.CameraSubject = Player.Character:WaitForChild("Humanoid")
+            Player.PlayerGui.UI.MainMenu.Visible = false
+            Player.PlayerGui.UI.HUD.Visible = true
+        end
+    end
+
+    if AutoReset and (Player.Character or Player.CharacterAdded:Wait()) then
+        if Player.Character:WaitForChild("Humanoid").Health > 0 then
+            local Stats = Player.Character:WaitForChild("Stats")
+            local Stam = Stats:GetAttribute("Stamina")
+            if Stam < 30 then
+                Reset()
+            end
+        end
+    end
+
+    if Aimbot and (Player.Character or Player.CharacterAdded:Wait()) and Player.Character:WaitForChild("Humanoid").Health > 0 then
+        if PlrToTarget and PlrToTarget.Character:FindFirstChild("Humanoid") then
+            if PlrToTarget.Character.Humanoid.Health > 0 then
+                Camera.CFrame = CFrame.new(Camera.CFrame.Position, PlrToTarget.Character.Torso.Position)
+            end
+        else
+            PlrToTarget = GetClosest()
+        end
+
+        if not Aimbot then
+            return
+        end
+    end
+
+    if BoxESP then
+        for i, v in ipairs(Players:GetPlayers()) do
+            if not HasBox(v) and v ~= Player then
+                NewBox(v)
+            end
+        end
+
+        for i2, v2 in ipairs(Boxes) do
+            local Plr = v2["Player"]
+            if Plr.Character and Plr.Character:FindFirstChild("HumanoidRootPart") then
+                ShapeBox(v2)
+                local _, WithinScreenBounds = Camera:WorldToScreenPoint(Plr.Character.HumanoidRootPart.Position)
+                if WithinScreenBounds then
+                    VisBox(v2, true)
+                else
+                    warn(WithingScreenBounds)
+                    VisBox(v2, false)
+                end
+            else
+                VisBox(v2, false)
+            end
+        end
+    else
+        for i, v in ipairs(Boxes) do
+            local Plr = v["Player"]
+            VisBox(v, false)
+        end
+    end
+
+    if PlayerESP then
+        for i, v in pairs(game.Players:GetPlayers()) do
+            pcall(function()
+                if v.Character and v.Name ~= Player.Name then
+                    if not v.Character.Head:FindFirstChild("NameESP") then
+                        local BGui = Instance.new("BillboardGui", v.Character.Head)
+                        BGui.Name = "NameESP"
+                        BGui.Size = UDim2.new(0, 175, 0, 30)
+                        BGui.Adornee = v.Character.Head
+                        BGui.AlwaysOnTop = true
+
+                        local Nama = Instance.new("TextLabel", BGui)
+                        Nama.Name = "Nama"
+                        Nama.Text = (v.Name .. " (" .. Round((game.Players.LocalPlayer.Character.Head.Position - v.Character.Head.Position).Magnitude/3) .. "m)")
+                        Nama.TextScaled = true
+                        Nama.Size = UDim2.new(1, 0, 0.33, 0)
+                        Nama.Position = UDim2.new(0, 0, 0, 0)
+                        Nama.TextYAlignment = "Top"
+                        Nama.TextColor3 = Color3.fromRGB(255, 180, 0)
+                        Nama.BackgroundTransparency = 1
+                        Nama.Font = Enum.Font.GothamBold
+                        Nama.TextStrokeTransparency = 0.5
+
+                        local Health = Instance.new("TextLabel", BGui)
+                        Health.Name = "Health"
+                        Health.Text = "Health: " .. Round(v.Character.Humanoid.Health) .. "/" .. Round(v.Character.Humanoid.MaxHealth)
+                        Health.TextScaled = true
+                        Health.Size = UDim2.new(1, 0, 0.33, 0)
+                        Health.Position = UDim2.new(0, 0, 0.34, 0)
+                        Health.TextYAlignment = "Top"
+                        Health.TextColor3 = Color3.fromRGB(255, 180, 0)
+                        Health.BackgroundTransparency = 1
+                        Health.Font = Enum.Font.GothamBold
+                        Health.TextStrokeTransparency = 0.5
+
+                        local Froot = Instance.new("TextLabel", BGui)
+                        Froot.Name = "Fruit"
+                        Froot.Text = "Fruit: " .. v.MAIN_DATA.Slots[v.MAIN_DATA.Slot.Value].Value
+                        Froot.TextScaled = true
+                        Froot.Size = UDim2.new(1, 0, 0.33, 0)
+                        Froot.Position = UDim2.new(0, 0, 0.68, 0)
+                        Froot.TextYAlignment = "Top"
+                        Froot.TextColor3 = Color3.fromRGB(255, 180, 0)
+                        Froot.BackgroundTransparency = 1
+                        Froot.Font = Enum.Font.GothamBold
+                        Froot.TextStrokeTransparency = 0.5
+                    else
+                        v.Character.Head.NameESP.Nama.Text = (v.Name .. " (" .. Round((game.Players.LocalPlayer.Character.Head.Position - v.Character.Head.Position).Magnitude/3) .. "m)")
+                        v.Character.Head.NameESP.Health.Text = "Health: " .. Round(v.Character.Humanoid.Health) .. "/" .. Round(v.Character.Humanoid.MaxHealth)
+                    end
+                end
+            end)
+        end
+    else
+        for i, v in pairs(game.Players:GetPlayers()) do
+            if v.Character and v.Character:FindFirstChild("Head") and v.Name ~= Player.Name then
+                if v.Character.Head:FindFirstChild("NameESP") then
+                    v.Character.Head:FindFirstChild("NameESP"):Destroy()
+                end
+            end
+        end
+    end
+
+    if AutoSpin then
+        if table.find(FruitsTable, PlayerFruit) then
+            AutoSpin = false
+            ASToggle1:Set(false)
+        else
+            local String1 = "FruitsHandler"
+            local String2 = "Spin"
+            local Table3 = {}
+            if SpinMethod == "Fast" then
+                Table3 = {
+                    ["Type"] = "Fast"
+                }
+            else
+                Table3 = {}
+            end
+            game:GetService("ReplicatedStorage").Replicator:InvokeServer(String1, String2, Table3)
+        end
+    end
+
+    local CurrentTarget
+    if AutoFarmPlayer then
+        if Target ~= nil then
+            if Target == "Highest" then
+                CurrentTarget = GetHighestBounty()
+                if CurrentTarget ~= nil and CurrentTarget.Character then
+                    Player.Character.HumanoidRootPart.CFrame = CurrentTarget.Character:WaitForChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, 3)
+                end
+            else
+                CurrentTarget = GetLowestBounty()
+                if CurrentTarget ~= nil and CurrentTarget.Character then
+                    Player.Character.HumanoidRootPart.CFrame = CurrentTarget.Character:WaitForChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, 3)
+                    if CurrentTarget.Character.Humanoid.Health < 1 then
+                        if not table.find(KilledPlayers, CurrentTarget.Name) then
+                            table.insert(KilledPlayers, CurrentTarget.Name)
+                        end
+                    end
+                end
+            end
+        else
+            Library:Notification("Error", "Target is nil, please select target first")
+            AutoFarmPlayer = false
+            APToggle1:Set(false)
+        end
+
+        local ohString1 = "Core"
+        local ohString2 = "M1"
+        local ohTable3 = {}
+        game:GetService("ReplicatedStorage").Replicator:InvokeServer(ohString1, ohString2, ohTable3)
+
+        if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("1") then
+            local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("1").Title.Text, "%s+", "")
+            local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+            game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+        end
+
+        if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2") then
+            local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2").Title.Text, "%s+", "")
+            local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+            game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+        end
+
+        if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("3") then
+            local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("3").Title.Text, "%s+", "")
+            local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+            game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+        end
+
+        if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("4") then
+            local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("4").Title.Text, "%s+", "")
+            local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+            game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+        end
+
+        if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("5") then
+            local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("5").Title.Text, "%s+", "")
+            local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+            game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+        end
+
+        if Player.Character then
+            if Player.Character.Humanoid then
+                if Player.Character.Humanoid.Health < 50 then
+                    AutoFarmPlayer = false
+                    APToggle1:Set(false)
+                    Player.Character.HumanoidRootPart.CFrame = CFrame.new(531.474609375, 734.0032348632812, 1484.79150390625)
+                    wait(20)
+                    AutoFarmPlayer = true
+                    APToggle1:Set(true)
+                end
+            end
+        end
+    end
+
+    if AutoFarmXP and (Player.Character or Player.CharacterAdded:Wait()) and Player.Character.Humanoid.Health > 0 then
+        if table.find(SkillsTable, "Skill 1") then
+            if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("1") then
+                local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("1").Title.Text, "%s+", "")
+                local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+            end
+        end
+
+        if table.find(SkillsTable, "Skill 2") then
+            if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2") then
+                local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2").Title.Text, "%s+", "")
+                local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+            end
+        end
+
+        if table.find(SkillsTable, "Skill 3") then
+            if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("3") then
+                local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("3").Title.Text, "%s+", "")
+                local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+            end
+        end
+
+        if table.find(SkillsTable, "Skill 4") then
+            if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("4") then
+                local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("4").Title.Text, "%s+", "")
+                local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+            end
+        end
+
+        if table.find(SkillsTable, "Skill 5") then
+            if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("5") then
+                local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("5").Title.Text, "%s+", "")
+                local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+            end
+        end
+
+        if table.find(SkillsTable, "Skill 6") then
+            if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("6") then
+                local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("6").Title.Text, "%s+", "")
+                local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+            end
+        end
+    end
+
+    table.clear(PlayerList)
+    for i, v in pairs(game.Players:GetPlayers()) do
+        if v.Name ~= Player.Name and v.Character then
+            if not table.find(PlayerList, v.Name) then
+                table.insert(PlayerList, v.Name)
+            end
+        end
+    end
+end)
+
+
+
