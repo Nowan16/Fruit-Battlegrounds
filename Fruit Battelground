@@ -11,6 +11,7 @@ local PlayerList = {}
 local KilledPlayers = {}
 local PlayerFruit = ""
 local CurrentTarget = nil
+local Busy = false
 
 local UIS = game:GetService("UserInputService")
 local CodesTable = {"MAGMALETSGOO", "SORRY4SHUTDOWN", "60KLETSGOOOO", "FREEBREAD!", "THXFOR70K", "80KAHHHHH", "COMEONMARCOOO", "SORRY4SHUTDOWN", "WINTERDAYZ", "110KYEE", "LASTSHUTDOWNALRIGHT", "INDAZONE"}
@@ -134,14 +135,17 @@ local AFToggle2 = AF:Toggle("Reset when Low Stamina", false, "ResetLowStam1", fu
     AutoReset = Value
 end)
 
-local SkillsTable = {}
+local SkillsTable = {"Skill 1"}
 local AFMD1 = AF:MultiDropdown("Select Skills", {"Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"}, {"Skill 1"}, "SelectSkills1", function(Option)
     SkillsTable = Option
 end)
 
-AF:Button("Teleport to AFK Place", function()
-    Player.Character.HumanoidRootPart.CFrame = CFrame.new(531.474609375, 734.0032348632812, 1484.79150390625)
+local SkillsHold = {"Skill 2"}
+local AFMD2 = AF:MultiDropdown("Hold Skills", {"Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"}, {"Skill 2"}, "HoldSkills1", function(Option)
+    SkillsHold = Option
 end)
+
+local Label1 = AF:Label("If you are using hold skills you can't tab out")
 
 local FruitsTable = {"Phoenix", "Quake", "Gravity"}
 local ASMD1 = AS:MultiDropdown("Select Fruits", {"Phoenix", "Quake", "Gravity", "Magma", "Flame", "Light", "Darkness", "Ice", "Bomb"}, {"Phoenix", "Quake", "Gravity"}, "SelectFruits1", function(Option)
@@ -728,7 +732,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
         end
     end
 
-    if AutoFarmPlayer and (Player.Character or Player.CharacterAdded:Wait()) then
+    if AutoFarmPlayer and (Player.Character or Player.CharacterAdded:Wait()) and Busy ~= true then
         if Target == "Lowest" and CurrentTarget == nil then
             CurrentTarget = GetLowestBounty()
         elseif Target == "Highest" and CurrentTarget == nil then
@@ -790,7 +794,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
         game:GetService("ReplicatedStorage").Replicator:InvokeServer(ohString1, ohString2, ohTable3)
     end
 
-    if AutoFarmMarco and (Player.Character or Player.CharacterAdded:Wait()) then
+    if AutoFarmMarco and (Player.Character or Player.CharacterAdded:Wait()) and Busy ~= true then
         if game.Workspace.Characters.NPCs:FindFirstChild("Marco") then
             local Marco = game.Workspace.Characters.NPCs:WaitForChild("Marco")
             if Marco:WaitForChild("Humanoid").Health >= 1 then
@@ -804,8 +808,20 @@ game:GetService("RunService").RenderStepped:Connect(function()
         
                 if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2") then
                     local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2").Title.Text, "%s+", "")
-                    local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
-                    game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+                    if table.find(SkillsHold, "Skill 2") and not Player.Cooldowns:FindFirstChild(Str) then
+                        local Tool = Player.Backpack:FindFirstChild(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2").Title.Text) or Player.Character:FindFirstChild(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2").Title.Text)
+                        if Tool then
+                            Tool.Parent = Player.Character
+                            Busy = true
+                            mouse1press()
+                            wait(5)
+                            mouse1release()
+                            Busy = false
+                        end
+                    else
+                        local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                        game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+                    end
                 end
         
                 if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("3") then
@@ -846,7 +862,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
         game:GetService("ReplicatedStorage").Replicator:InvokeServer(ohString1, ohString2, ohTable3)
     end
 
-    if AutoFarmXP and (Player.Character or Player.CharacterAdded:Wait()) and Player.Character.Humanoid.Health > 0 then
+    if AutoFarmXP and (Player.Character or Player.CharacterAdded:Wait()) and Player.Character.Humanoid.Health > 0 and Busy ~= true then
         Player.Character.HumanoidRootPart.CFrame = CFrame.new(1439.4222412109375, 609.2628173828125, -223.74435424804688)
         if table.find(SkillsTable, "Skill 1") then
             if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("1") then
@@ -859,8 +875,20 @@ game:GetService("RunService").RenderStepped:Connect(function()
         if table.find(SkillsTable, "Skill 2") then
             if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2") then
                 local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2").Title.Text, "%s+", "")
-                local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
-                game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+                if table.find(SkillsHold, "Skill 2") and not Player.Cooldowns:FindFirstChild(Str) then
+                    local Tool = Player.Backpack:FindFirstChild(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2").Title.Text) or Player.Character:FindFirstChild(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2").Title.Text)
+                    if Tool then
+                        Tool.Parent = Player.Character
+                        Busy = true
+                        mouse1press()
+                        wait(5)
+                        mouse1release()
+                        Busy = false
+                    end
+                else
+                    local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                    game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+                end
             end
         end
 
