@@ -807,21 +807,9 @@ game:GetService("RunService").RenderStepped:Connect(function()
                 end
         
                 if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2") then
-                    local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2").Title.Text, "%s+", "")
-                    if table.find(SkillsHold, "Skill 2") and not Player.Cooldowns:FindFirstChild(Str) then
-                        local Tool = Player.Backpack:FindFirstChild(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2").Title.Text) or Player.Character:FindFirstChild(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2").Title.Text)
-                        if Tool then
-                            Tool.Parent = Player.Character
-                            Busy = true
-                            mouse1press()
-                            wait(5)
-                            mouse1release()
-                            Busy = false
-                        end
-                    else
-                        local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
-                        game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
-                    end
+                    local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2").Title.Text, "%s+", "")       
+                    local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                    game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
                 end
         
                 if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("3") then
