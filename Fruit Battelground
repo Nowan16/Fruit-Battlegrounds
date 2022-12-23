@@ -222,8 +222,13 @@ end)
 
 local BossSpawned = Boss:Label("Marco Spawned: No")
 
+local AutoFarmMarco
+local BToggle1 = Boss:Toggle("Auto Farm Marco", false, "MarcoFarm1", function(Value)
+    AutoFarmMarco = Value
+end)
+
 local MarcoESP
-local BToggle1 = Boss:Toggle("Marco ESP", false, "MarcoEsp1", function(Value)
+local BToggle2 = Boss:Toggle("Marco ESP", false, "MarcoEsp1", function(Value)
     MarcoESP = Value
 end)
 
@@ -232,7 +237,7 @@ local BButton1 = Boss:Button("Hop Server for Boss", function()
     rejoinPreferred({
         SizeSort = "desc",
         MinPlayers = 3,
-        MaxPlayers = math.random(4, 6),
+        MaxPlayers = 7,
         ExcludeFull = true,
         ExcludeSame = true,
         MinFps = 30,
@@ -469,7 +474,6 @@ local function Reset()
         game:GetService("StarterGui"):SetCoreGuiEnabled("Backpack", false)
         game:GetService("StarterGui"):SetCoreGuiEnabled("PlayerList",true)
         game:GetService("StarterGui"):SetCoreGuiEnabled("Chat",true)
-        Player.Character.HumanoidRootPart.CFrame = CFrame.new(1439.4222412109375, 609.2628173828125, -223.74435424804688)
     end
 end
 
@@ -777,6 +781,62 @@ game:GetService("RunService").RenderStepped:Connect(function()
                     AutoFarmPlayer = true
                     APToggle1:Set(true)
                 end
+            end
+        end
+
+        local ohString1 = "Core"
+        local ohString2 = "M1"
+        local ohTable3 = {}
+        game:GetService("ReplicatedStorage").Replicator:InvokeServer(ohString1, ohString2, ohTable3)
+    end
+
+    if AutoFarmMarco and (Player.Character or Player.CharacterAdded:Wait()) then
+        if game.Workspace.Characters.NPCs:FindFirstChild("Marco") then
+            local Marco = game.Workspace.Characters.NPCs:WaitForChild("Marco")
+            if Marco:WaitForChild("Humanoid").Health >= 1 then
+                Player.Character.HumanoidRootPart.CFrame = Marco:WaitForChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, 3)
+
+                if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("1") then
+                    local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("1").Title.Text, "%s+", "")
+                    local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                    game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+                end
+        
+                if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2") then
+                    local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("2").Title.Text, "%s+", "")
+                    local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                    game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+                end
+        
+                if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("3") then
+                    local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("3").Title.Text, "%s+", "")
+                    local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                    game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+                end
+        
+                if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("4") then
+                    local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("4").Title.Text, "%s+", "")
+                    local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                    game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+                end
+        
+                if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("5") then
+                    local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("5").Title.Text, "%s+", "")
+                    local args = {[1] = PlayerFruit, [2] = Str, [3] = {}}
+                    game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
+                end
+            end
+        end
+
+        if Player.Character and Player.Character.Humanoid.Health <= 50 then
+            Reset()
+        end
+
+        if Player.Character then
+            local Stats = Player.Character:WaitForChild("Stats")
+            local Stam = Stats:GetAttribute("Stamina")
+            if Stam < 30 then
+                Reset()
             end
         end
 
