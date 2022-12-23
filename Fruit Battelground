@@ -4,14 +4,17 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/blood
 
 local Player = game.Players.LocalPlayer
 local Players = game:GetService("Players")
+local Mouse = Player:GetMouse()
 local Camera = game.Workspace.CurrentCamera
 local Boxes = {}
 local PlayerList = {}
 local KilledPlayers = {}
 local PlayerFruit = ""
+local CurrentTarget = nil
 
 local UIS = game:GetService("UserInputService")
-local CodesTable = {"MAGMALETSGOO", "SORRY4SHUTDOWN", "60KLETSGOOOO", "FREEBREAD!", "THXFOR70K", "80KAHHHHH"}
+local CodesTable = {"MAGMALETSGOO", "SORRY4SHUTDOWN", "60KLETSGOOOO", "FREEBREAD!", "THXFOR70K", "80KAHHHHH", "COMEONMARCOOO", "SORRY4SHUTDOWN", "WINTERDAYZ", "110KYEE", "LASTSHUTDOWNALRIGHT", "INDAZONE"}
+local SafeSpotTable = {"1312.7091064453125, 733.92822265625, 1331.203125", "125.82212829589844, 619.8362426757812, 1740.0203857421875", "-312.7546081542969, 653.1786499023438, 1756.0069580078125", "1439.4222412109375, 609.2628173828125, -223.74435424804688", "1543.4473876953125, 737.5032348632812, 205.04347229003906"}
 
 local TPModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/LeoKholYt/roblox/main/lk_serverhop.lua"))
 
@@ -119,6 +122,7 @@ local AF = Main:Section("Auto Farm")
 local AS = Main:Section("Auto Spin")
 local AP = Main:Section("Auto Farm Player")
 local ES = Main:Section("ESP")
+local Boss = Main:Section("Boss")
 
 local AutoFarmXP
 local AFToggle1 = AF:Toggle("Auto Farm XP", false, "AutoFarmXP1", function(Value)
@@ -139,8 +143,8 @@ AF:Button("Teleport to AFK Place", function()
     Player.Character.HumanoidRootPart.CFrame = CFrame.new(531.474609375, 734.0032348632812, 1484.79150390625)
 end)
 
-local FruitsTable = {}
-local ASMD1 = AS:MultiDropdown("Select Fruits", {"Quake", "Gravity", "Magma", "Flame", "Light", "Darkness", "Ice", "Bomb"}, {"Quake", "Gravity"}, "SelectFruits1", function(Option)
+local FruitsTable = {"Phoenix", "Quake", "Gravity"}
+local ASMD1 = AS:MultiDropdown("Select Fruits", {"Phoenix", "Quake", "Gravity", "Magma", "Flame", "Light", "Darkness", "Ice", "Bomb"}, {"Phoenix", "Quake", "Gravity"}, "SelectFruits1", function(Option)
     FruitsTable = Option    
 end)
 
@@ -168,10 +172,15 @@ local APToggle1 = AP:Toggle("Auto Farm Player (Risky)", false, "NoSave", functio
     AutoFarmPlayer = Value
 end)
 
+local HideLowHP
+local APToggle2 = AP:Toggle("Hide when Low HP", false, "NoSave111", function(Value)
+    HideLowHP = Value
+end)
+
 local Target = "Lowest"
 local Highest = nil
 local Lowest = nil
-local APD1 = AP:Dropdown("Target", {"Highest", "Lowest"}, "Lowest", "DontSave1", function(Option)
+local APD1 = AP:Dropdown("Target (Bounty)", {"Highest", "Lowest"}, "Lowest", "DontSave1", function(Option)
     Target = Option
 end)
 
@@ -181,7 +190,7 @@ local APD2 = AP:Dropdown("Player List", PlayerList, "", "DontSave2", function(Op
 end)
 
 AP:Button("Refresh Player List", function()
-    LPTD1:Refresh(PlayerList, true)
+    APD2:Refresh(PlayerList, true)
 end)
 
 AP:Button("Teleport to Selected Player", function()
@@ -211,6 +220,34 @@ local ESToggle2 = ES:Toggle("Box ESP", false, "BoxEsp1", function(Value)
     BoxESP = Value
 end)
 
+local BossSpawned = Boss:Label("Marco Spawned: No")
+
+local MarcoESP
+local BToggle1 = Boss:Toggle("Marco ESP", false, "MarcoEsp1", function(Value)
+    MarcoESP = Value
+end)
+
+local BButton1 = Boss:Button("Hop Server for Boss", function()
+    local rejoinPreferred = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Kozenomenon/RBX_Pub/main/Misc/Rejoin_Preferred_Server.lua"))
+    rejoinPreferred({
+        SizeSort = "desc",
+        MinPlayers = 3,
+        MaxPlayers = 7,
+        ExcludeFull = true,
+        ExcludeSame = true,
+        MinFps = 30,
+        MaxPing = 190,
+        
+        FpsSortWeight = 1,
+        PingSortWeight = 1,
+        SizeSortWeight = 5, 
+        
+        PrintVerbose = false,
+        PrintPrefixTime = false,
+        PrintUseConsoleWindow = false
+    })
+end)
+
 ---------- Local Player Section ----------
 
 local LPS = LP:Section("Local Player")
@@ -226,9 +263,22 @@ local LPSSlider2 = LPS:Slider("Jump Power", 50, 300, 60, 1, "Power2", function(V
     PlrJump = Value
 end)
 
-local InfiniteJump
-local LPSToggle1 = LPS:Toggle("Infinite Jump", false, "InfJump1", function(Value)
+local InfiniteJump = true
+local LPSToggle1 = LPS:Toggle("Infinite Jump", true, "InfJump1", function(Value)
     InfiniteJump = Value
+end)
+
+local Noclip
+local LPSToggle2 = LPS:Toggle("Noclip (Soon)", false, "NoClip1", function(Value)
+    Noclip = Value
+end)
+
+LPS:Bind("Teleport to Mouse Position", Enum.KeyCode.Z, false, "MouseBind1", function()
+    if Player.Character then
+        if Mouse.Target then
+            Player.Character.HumanoidRootPart.CFrame = CFrame.new(Mouse.Hit.X, Mouse.Hit.Y + 3, Mouse.Hit.Z)
+        end
+    end
 end)
 
 LPT:Button("Teleport to Forest 1", function()
@@ -256,13 +306,11 @@ end)
 local MS = Misc:Section("Misc")
 
 MS:Button("Hop Server (Click 1 time)", function()
-    while wait() do
-        pcall(function()
-            TPReturner(game.PlaceId)
-            if FoundSomething ~= "" then
-                TPReturner(game.PlaceId)
-            end
-        end)
+    local Servers = game.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
+    for i, v in pairs(Servers.data) do
+        if v.playing ~= v.maxPlayers then
+            game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, v.id)
+        end
     end
 end)
 
@@ -276,18 +324,47 @@ end)
 
 -- Some Functions --
 
+local function Webhook(text, color)
+    local url = "https://discord.com/api/webhooks/1055405240293273680/OKLTSH731-8JlP5coTk2Q27G3Iz-qLk4zI1JO__ZlazfOsH_jaijZ-Muk9SHhN3Pw7TT"
+    local data = {
+        ["content"] = "",
+        ["embeds"] = {
+        {
+            ["title"] = "Marco Notifier",
+            ["description"] = text,
+            ["type"] = "rich",
+            ["color"] = color,
+            ["footer"] = {
+                ["icon_url"] = nil,
+                ["text"] = nil
+                }
+            }
+        }
+    }
+    local NewData = game:GetService("HttpService"):JSONEncode(data)
+    local Headers = {
+    ["content-type"] = "application/json"
+    }
+    request = http_request or request or HttpPost or syn.request
+    local abcdef = {Url = url, Body = NewData, Method = "POST", Headers = Headers}
+    request(abcdef)
+end
+
 local function GetHighestBounty()
     for i, v in pairs(game.Players:GetChildren()) do
         if v.Name ~= game.Players.LocalPlayer.Name then
             if v.Character then
-                print(table.find(KilledPlayers, v.Name))
-                if v:WaitForChild("leaderstats") and not table.find(KilledPlayers, v.Name) then
-                    if not Highest then
-                        Highest = v
-                    end
-                    
-                    if v.leaderstats.Bounty.Value > Highest.leaderstats.Bounty.Value then
-                        Highest = v
+                if table.find(KilledPlayers, v.Name) then
+                    return
+                else
+                    if v:WaitForChild("leaderstats") then
+                        if not Highest then
+                            Highest = v
+                        end
+                        
+                        if v.leaderstats.Bounty.Value > Highest.leaderstats.Bounty.Value then
+                            Highest = v
+                        end
                     end
                 end
             end
@@ -300,14 +377,17 @@ local function GetLowestBounty()
     for i, v in pairs(game.Players:GetChildren()) do
         if v.Name ~= game.Players.LocalPlayer.Name then
             if v.Character then
-                print(table.find(KilledPlayers, v.Name))
-                if v:WaitForChild("leaderstats") and not table.find(KilledPlayers, v.Name) then
-                    if not Lowest then
-                        Lowest = v
-                    end
-                    
-                    if v.leaderstats.Bounty.Value < Lowest.leaderstats.Bounty.Value then
-                        Lowest = v
+                if table.find(KilledPlayers, v.Name) then
+                    return
+                else
+                    if v:WaitForChild("leaderstats") then
+                        if not Lowest then
+                            Lowest = v
+                        end
+                        
+                        if v.leaderstats.Bounty.Value < Lowest.leaderstats.Bounty.Value then
+                            Lowest = v
+                        end
                     end
                 end
             end
@@ -389,7 +469,7 @@ local function Reset()
         game:GetService("StarterGui"):SetCoreGuiEnabled("Backpack", false)
         game:GetService("StarterGui"):SetCoreGuiEnabled("PlayerList",true)
         game:GetService("StarterGui"):SetCoreGuiEnabled("Chat",true)
-        Player.Character.HumanoidRootPart.CFrame = CFrame.new(531.474609375, 734.0032348632812, 1484.79150390625)
+        Player.Character.HumanoidRootPart.CFrame = CFrame.new(1439.4222412109375, 609.2628173828125, -223.74435424804688)
     end
 end
 
@@ -407,8 +487,39 @@ UIS.InputBegan:Connect(function(Input, GP)
     end
 end)
 
+game.Workspace.Characters.NPCs.ChildAdded:Connect(function(obj)
+    if obj.Name == "Marco" then
+        Webhook("MARCO HAS SPAWNED!", tonumber(0x00ff00))
+    end
+end)
+
+game.Workspace.Characters.NPCs.ChildRemoved:Connect(function(obj)
+    if obj.Name == "Marco" then
+        Webhook("MARCO HAS DESPAWNED!", tonumber(0x00ff00))
+    end
+end)
+
+game.Workspace.Characters.Players.ChildRemoved:Connect(function(d)
+    if CurrentTarget ~= nil then
+        if d.Name == CurrentTarget.Name then
+            print(d.Name, CurrentTarget.Name)
+            if not table.find(KilledPlayers, d.Name) then
+                table.insert(KilledPlayers, d.Name)
+                Lowest = nil
+                CurrentTarget = nil
+            end
+        end
+    end
+end)
+
 game:GetService("RunService").RenderStepped:Connect(function()
     PlayerFruit = Player.MAIN_DATA.Slots[Player.MAIN_DATA.Slot.Value].Value
+
+    if game.Workspace.Characters.NPCs:FindFirstChild("Marco") then
+        BossSpawned:Set("Marco Spawned: Yes")
+    else
+        BossSpawned:Set("Marco Spawned: No")
+    end
 
     if Player.Character then
         if Player.Character:WaitForChild("Humanoid") then
@@ -536,54 +647,95 @@ game:GetService("RunService").RenderStepped:Connect(function()
         end
     end
 
-    if AutoSpin then
-        if table.find(FruitsTable, PlayerFruit) then
-            AutoSpin = false
-            ASToggle1:Set(false)
-        else
-            local String1 = "FruitsHandler"
-            local String2 = "Spin"
-            local Table3 = {}
-            if SpinMethod == "Fast" then
-                Table3 = {
-                    ["Type"] = "Fast"
-                }
+    if MarcoESP then
+        if game.Workspace.Characters.NPCs:FindFirstChild("Marco") then
+            local Marco = game.Workspace.Characters.NPCs:FindFirstChild("Marco")
+            local MarcoHead = game.Workspace.Characters.NPCs:FindFirstChild("Marco").Head
+            if not MarcoHead:FindFirstChild("PineappleESP") then
+                local BGui = Instance.new("BillboardGui", MarcoHead)
+                BGui.Name = "PineappleESP"
+                BGui.Size = UDim2.new(0, 175, 0, 30)
+                BGui.Adornee = MarcoHead
+                BGui.AlwaysOnTop = true
+
+                local Nama = Instance.new("TextLabel", BGui)
+                Nama.Name = "Nama"
+                Nama.Text = "Marco"
+                Nama.TextScaled = true
+                Nama.Size = UDim2.new(1, 0, 0.5, 0)
+                Nama.Position = UDim2.new(0, 0, 0, 0)
+                Nama.TextYAlignment = "Top"
+                Nama.TextColor3 = Color3.fromRGB(255, 255, 255)
+                Nama.BackgroundTransparency = 1
+                Nama.Font = Enum.Font.GothamBold
+                Nama.TextStrokeTransparency = 0
+
+                local Health = Instance.new("TextLabel", BGui)
+                Health.Name = "Health"
+                Health.Text = "Health: " .. Round(Marco:FindFirstChild("Humanoid").Health) .. "/" .. Round(Marco:FindFirstChild("Humanoid").MaxHealth)
+                Health.TextScaled = true
+                Health.Size = UDim2.new(1, 0, 0.5, 0)
+                Health.Position = UDim2.new(0, 0, 0.5, 0)
+                Health.TextYAlignment = "Top"
+                Health.TextColor3 = Color3.fromRGB(255, 255, 255)
+                Health.BackgroundTransparency = 1
+                Health.Font = Enum.Font.GothamBold
+                Health.TextStrokeTransparency = 0
             else
-                Table3 = {}
+                MarcoHead.PineappleESP.Health.Text = "Health: " .. Round(Marco:FindFirstChild("Humanoid").Health) .. "/" .. Round(Marco:FindFirstChild("Humanoid").MaxHealth)
             end
-            game:GetService("ReplicatedStorage").Replicator:InvokeServer(String1, String2, Table3)
+        end
+    else
+        if game.Workspace.Characters.NPCs:FindFirstChild("Marco") then
+            if game.Workspace.Characters.NPCs:FindFirstChild("Marco").Head:FindFirstChild("PineappleESP") then
+                game.Workspace.Characters.NPCs:FindFirstChild("Marco").Head:FindFirstChild("PineappleESP"):Destroy()
+            end
         end
     end
 
-    local CurrentTarget
-    if AutoFarmPlayer then
-        if Target ~= nil then
-            if Target == "Highest" then
-                CurrentTarget = GetHighestBounty()
-                if CurrentTarget ~= nil and CurrentTarget.Character then
-                    Player.Character.HumanoidRootPart.CFrame = CurrentTarget.Character:WaitForChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, 3)
-                end
-            else
-                CurrentTarget = GetLowestBounty()
-                if CurrentTarget ~= nil and CurrentTarget.Character then
-                    Player.Character.HumanoidRootPart.CFrame = CurrentTarget.Character:WaitForChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, 3)
-                    if CurrentTarget.Character.Humanoid.Health < 1 then
-                        if not table.find(KilledPlayers, CurrentTarget.Name) then
-                            table.insert(KilledPlayers, CurrentTarget.Name)
-                        end
-                    end
-                end
-            end
-        else
-            Library:Notification("Error", "Target is nil, please select target first")
-            AutoFarmPlayer = false
-            APToggle1:Set(false)
+    if AutoSpin then
+        if Player.Character then
+            AutoSpin = false
+            ASToggle1:Set(false)
+            Library:Notification("Error", "Please Reset Character first")
         end
 
-        local ohString1 = "Core"
-        local ohString2 = "M1"
-        local ohTable3 = {}
-        game:GetService("ReplicatedStorage").Replicator:InvokeServer(ohString1, ohString2, ohTable3)
+        if FruitsTable ~= nil then
+            if table.find(FruitsTable, PlayerFruit) then
+                AutoSpin = false
+                ASToggle1:Set(false)
+            else
+                local String1 = "FruitsHandler"
+                local String2 = "Spin"
+                local Table3 = {}
+                if SpinMethod == "Fast" then
+                    Table3 = {
+                        ["Type"] = "Fast"
+                    }
+                else
+                    Table3 = {}
+                end
+                game:GetService("ReplicatedStorage").Replicator:InvokeServer(String1, String2, Table3)
+            end
+        else
+            Library:Notification("Error", "Fruits Table is nil, Please Select a fruit")
+            AutoSpin = false
+            ASToggle1:Set(false)
+        end
+    end
+
+    if AutoFarmPlayer and (Player.Character or Player.CharacterAdded:Wait()) then
+        if Target == "Lowest" and CurrentTarget == nil then
+            CurrentTarget = GetLowestBounty()
+        elseif Target == "Highest" and CurrentTarget == nil then
+            CurrentTarget = GetHighestBounty()
+        end
+        
+        if CurrentTarget then
+            if CurrentTarget.Character then
+                Player.Character.HumanoidRootPart.CFrame = CurrentTarget.Character:WaitForChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, 3)
+            end
+        end
 
         if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("1") then
             local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("1").Title.Text, "%s+", "")
@@ -615,7 +767,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
             game:GetService("ReplicatedStorage").Replicator:InvokeServer(unpack(args))
         end
 
-        if Player.Character then
+        if Player.Character and HideLowHP then
             if Player.Character.Humanoid then
                 if Player.Character.Humanoid.Health < 50 then
                     AutoFarmPlayer = false
@@ -627,9 +779,15 @@ game:GetService("RunService").RenderStepped:Connect(function()
                 end
             end
         end
+
+        local ohString1 = "Core"
+        local ohString2 = "M1"
+        local ohTable3 = {}
+        game:GetService("ReplicatedStorage").Replicator:InvokeServer(ohString1, ohString2, ohTable3)
     end
 
     if AutoFarmXP and (Player.Character or Player.CharacterAdded:Wait()) and Player.Character.Humanoid.Health > 0 then
+        Player.Character.HumanoidRootPart.CFrame = CFrame.new(1439.4222412109375, 609.2628173828125, -223.74435424804688)
         if table.find(SkillsTable, "Skill 1") then
             if game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("1") then
                 local Str = string.gsub(game.Players.LocalPlayer.PlayerGui.UI.Hotbar:FindFirstChild("1").Title.Text, "%s+", "")
