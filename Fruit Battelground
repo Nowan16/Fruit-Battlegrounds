@@ -232,7 +232,7 @@ local BButton1 = Boss:Button("Hop Server for Boss", function()
     rejoinPreferred({
         SizeSort = "desc",
         MinPlayers = 3,
-        MaxPlayers = math.random(5, 9),
+        MaxPlayers = math.random(4, 6),
         ExcludeFull = true,
         ExcludeSame = true,
         MinFps = 30,
