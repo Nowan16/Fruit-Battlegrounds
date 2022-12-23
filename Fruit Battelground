@@ -333,32 +333,6 @@ end)
 
 -- Some Functions --
 
-local function Webhook(text, color)
-    local url = "https://discord.com/api/webhooks/1055405240293273680/OKLTSH731-8JlP5coTk2Q27G3Iz-qLk4zI1JO__ZlazfOsH_jaijZ-Muk9SHhN3Pw7TT"
-    local data = {
-        ["content"] = "",
-        ["embeds"] = {
-        {
-            ["title"] = "Marco Notifier",
-            ["description"] = text,
-            ["type"] = "rich",
-            ["color"] = color,
-            ["footer"] = {
-                ["icon_url"] = nil,
-                ["text"] = nil
-                }
-            }
-        }
-    }
-    local NewData = game:GetService("HttpService"):JSONEncode(data)
-    local Headers = {
-    ["content-type"] = "application/json"
-    }
-    request = http_request or request or HttpPost or syn.request
-    local abcdef = {Url = url, Body = NewData, Method = "POST", Headers = Headers}
-    request(abcdef)
-end
-
 local function GetHighestBounty()
     for i, v in pairs(game.Players:GetChildren()) do
         if v.Name ~= game.Players.LocalPlayer.Name then
@@ -492,18 +466,6 @@ UIS.InputBegan:Connect(function(Input, GP)
                 end)
             end
         end)
-    end
-end)
-
-game.Workspace.Characters.NPCs.ChildAdded:Connect(function(obj)
-    if obj.Name == "Marco" then
-        Webhook("MARCO HAS SPAWNED!", tonumber(0x00ff00))
-    end
-end)
-
-game.Workspace.Characters.NPCs.ChildRemoved:Connect(function(obj)
-    if obj.Name == "Marco" then
-        Webhook("MARCO HAS DESPAWNED!", tonumber(0x00ff00))
     end
 end)
 
