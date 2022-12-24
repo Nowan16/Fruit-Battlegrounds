@@ -240,8 +240,8 @@ local BButton1 = Boss:Button("Hop Server for Boss", function()
     local rejoinPreferred = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Kozenomenon/RBX_Pub/main/Misc/Rejoin_Preferred_Server.lua"))
     rejoinPreferred({
         SizeSort = "desc",
-        MinPlayers = 3,
-        MaxPlayers = 7,
+        MinPlayers = 2,
+        MaxPlayers = math.random(3, 6),
         ExcludeFull = true,
         ExcludeSame = true,
         MinFps = 30,
